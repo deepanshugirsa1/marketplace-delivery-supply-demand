@@ -1,0 +1,17 @@
+name: marketplace_supply_demand
+version: 1.0.0
+profile: marketplace_sd
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  marketplace_supply_demand:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table

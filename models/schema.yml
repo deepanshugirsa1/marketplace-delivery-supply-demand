@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+  - name: mart_supply_demand_hourly
+    description: Canonical hourly supply-demand mart with signature marketplace metrics
+    columns:
+      - name: city
+        tests: [not_null]
+      - name: dasher_utilization
+        description: Active delivery hours / offered shift hours
+      - name: undersupply_rate
+        description: Excess order load vs target courier capacity
+      - name: on_time_delivery_rate
+        description: Share of orders delivered within promise window
