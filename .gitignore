@@ -14,3 +14,7 @@ data/lake/**
 !data/lake/.gitkeep
 data/export/**
 !data/export/.gitkeep
+
+.user.yml
+_demo_out.txt
+
