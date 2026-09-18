@@ -10,6 +10,8 @@ models:
     columns:
       - name: city
         tests: [not_null]
+      - name: hour_bucket
+        tests: [not_null]
       - name: dasher_utilization
         description: Active delivery hours / offered shift hours
       - name: undersupply_rate

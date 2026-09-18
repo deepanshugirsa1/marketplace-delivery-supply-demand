@@ -1,6 +1,11 @@
-"""Generate synthetic marketplace order, courier-shift, and merchant events."""
+"""Generate synthetic marketplace order, courier-shift, and merchant events.
+
+Default SCALE=1 ≈ 50k orders / 8k shifts over 14 days (representative city×hour load).
+Set SCALE=env int to multiply volumes for heavier local load tests.
+"""
 from __future__ import annotations
 
+import os
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -12,8 +17,10 @@ OUT.mkdir(parents=True, exist_ok=True)
 random.seed(42)
 
 CITIES = ["sf", "oak", "sj", "la", "sea"]
-N_ORDERS = 5000
-N_SHIFTS = 800
+SCALE = max(1, int(os.getenv("SCALE", "1")))
+N_ORDERS = 50_000 * SCALE
+N_SHIFTS = 8_000 * SCALE
+N_READINESS = 12_000 * SCALE
 START = datetime(2025, 9, 1, 8, 0, 0)
 
 
@@ -32,7 +39,7 @@ def gen_orders() -> pd.DataFrame:
                 "order_id": f"o{i}",
                 "city": city,
                 "merchant_id": f"m{random.randint(1, 200)}",
-                "courier_id": f"c{random.randint(1, 300)}",
+                "courier_id": f"c{random.randint(1, 3000)}",
                 "created_at": created.isoformat(),
                 "delivered_at": delivered.isoformat(),
                 "promise_minutes": promise_min,
@@ -53,7 +60,7 @@ def gen_shifts() -> pd.DataFrame:
         rows.append(
             {
                 "shift_id": f"s{i}",
-                "courier_id": f"c{random.randint(1, 300)}",
+                "courier_id": f"c{random.randint(1, 3000)}",
                 "city": city,
                 "shift_start": start.isoformat(),
                 "shift_hours": hours,
@@ -66,7 +73,7 @@ def gen_shifts() -> pd.DataFrame:
 
 def gen_merchant_readiness() -> pd.DataFrame:
     rows = []
-    for i in range(1200):
+    for i in range(N_READINESS):
         city = random.choice(CITIES)
         ts = START + timedelta(hours=random.randint(0, 14 * 24))
         rows.append(
@@ -83,10 +90,17 @@ def gen_merchant_readiness() -> pd.DataFrame:
 
 
 def main() -> None:
-    gen_orders().to_csv(OUT / "orders.csv", index=False)
-    gen_shifts().to_csv(OUT / "courier_shifts.csv", index=False)
-    gen_merchant_readiness().to_csv(OUT / "merchant_readiness.csv", index=False)
-    print(f"Wrote orders, courier_shifts, merchant_readiness to {OUT}")
+    orders = gen_orders()
+    shifts = gen_shifts()
+    readiness = gen_merchant_readiness()
+    orders.to_csv(OUT / "orders.csv", index=False)
+    shifts.to_csv(OUT / "courier_shifts.csv", index=False)
+    readiness.to_csv(OUT / "merchant_readiness.csv", index=False)
+    total = len(orders) + len(shifts) + len(readiness)
+    print(
+        f"Wrote orders={len(orders)}, shifts={len(shifts)}, readiness={len(readiness)} "
+        f"(total_events={total}, SCALE={SCALE}) -> {OUT}"
+    )
 
 
 if __name__ == "__main__":

@@ -8,4 +8,4 @@ SELECT
     promise_minutes,
     on_time,
     CAST(order_hour AS TIMESTAMP) AS order_hour
-FROM read_parquet('../data/lake/orders/**/*.parquet', hive_partitioning=true)
+FROM read_parquet('data/lake/orders/**/*.parquet', hive_partitioning=true)

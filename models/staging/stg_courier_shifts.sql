@@ -6,4 +6,4 @@ SELECT
     shift_hours,
     active_delivery_hours,
     CAST(shift_hour AS TIMESTAMP) AS shift_hour
-FROM read_parquet('../data/lake/courier_shifts/**/*.parquet', hive_partitioning=true)
+FROM read_parquet('data/lake/courier_shifts/**/*.parquet', hive_partitioning=true)
