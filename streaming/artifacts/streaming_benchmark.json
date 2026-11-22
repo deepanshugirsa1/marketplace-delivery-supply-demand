@@ -1,0 +1,12 @@
+{
+  "orders": 250000,
+  "events_produced": 1000012,
+  "produce_rate_eps": 31406.3,
+  "end_to_end_sec": 53.02,
+  "end_to_end_eps": 18859.9,
+  "pipeline_lag_sec": 20.07,
+  "windows_written": 60,
+  "late_events_routed": 20456,
+  "late_events_dropped": 0,
+  "stack": "Kafka 3.7 (KRaft) -> Flink 1.18 (2 taskmanagers, RocksDB, exactly-once) -> ClickHouse 24.3"
+}
