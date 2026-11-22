@@ -4,6 +4,12 @@ Canonical analytics layer for a three-sided marketplace (consumers, couriers/Das
 
 > **Status: Complete (local portfolio).** End-to-end lakehouse demo: synthetic events → Spark-style Parquet ingest → dbt staging/intermediate/marts → Great Expectations–style quality gates → KPI exports + Streamlit ops dashboard. Optional production wiring (EMR/Trino/live Tableau) is documented as future scope, not incomplete core.
 
+## Streaming layer
+
+The same city-minute supply and demand metrics also run on real infrastructure: **Kafka 3.7 (KRaft)** → **Flink 1.18** (jobmanager and two taskmanagers, RocksDB state, exactly-once checkpoints) → **ClickHouse 24.3** through the Kafka table engine. Late events go to a side topic and are landed, not dropped.
+
+A 250,000-order replay (1,000,012 events) measured **18,859.9 events/sec** end to end, **20.07 seconds** from the last event produced to the last window landed, and **20,456** late events routed with **0** dropped. Write-up and the raw artifact: [streaming/README.md](streaming/README.md), [streaming/artifacts/streaming_benchmark.json](streaming/artifacts/streaming_benchmark.json).
+
 ## Why this exists
 
 Marketplace ops need a single source of truth for supply/demand balance. This project models fulfillment events into **canonical datasets** and surfaces signature metrics so ops can rebalance local courier supply before late-order share spikes.
@@ -69,4 +75,4 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for EMR/Trino/Airflow/live BI — optiona
 
 ## Stack
 
-Python, SQL, dbt, DuckDB (local stand-in for Trino), Parquet / S3-layout lake, Spark-style batch ingest, Great Expectations–style checks, Streamlit.
+Python, SQL, dbt, DuckDB (local stand-in for Trino), Parquet / S3-layout lake, Spark-style batch ingest, Kafka 3.7 (KRaft), Flink 1.18, ClickHouse 24.3, Great Expectations–style checks, Streamlit.
